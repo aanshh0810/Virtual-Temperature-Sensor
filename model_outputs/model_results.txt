@@ -1,0 +1,35 @@
+Model Evaluation Results
+========================================
+
+Random Forest
+R2: 0.96927
+RMSE: 5.02888
+MAE: 2.10924
+MAPE: 0.03308
+
+LightGBM
+R2: 0.87880
+RMSE: 9.98699
+MAE: 6.51541
+MAPE: 0.11029
+
+CatBoost
+R2: 0.89016
+RMSE: 9.50748
+MAE: 6.10247
+MAPE: 0.10237
+
+HistGB
+R2: 0.88008
+RMSE: 9.93436
+MAE: 6.44036
+MAPE: 0.10830
+
+XGBoost
+R2: 0.88294
+RMSE: 9.81489
+MAE: 6.27591
+MAPE: 0.10571
+
+Best Model: RandomForestRegressor
+Model saved as: best_rf_model.pkl
