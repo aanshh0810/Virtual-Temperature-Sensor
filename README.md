@@ -6,4 +6,3 @@ The dataset can be found on kaggle : https://www.kaggle.com/datasets/wkirgsn/ele
 
 The project involved developing a Virtual Temperature Sensor that can estimate the internal temperature of an electric motor without relying on physical temperature sensors. The goal was to leverage machine learning and domain-specific knowledge to create a reliable, real-time prediction system using existing motor parameters.
 
-It is used in real worl senarios
