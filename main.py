@@ -50,6 +50,7 @@ predictions = {}
 
 # === Create output directory ===
 os.makedirs("model_outputs", exist_ok=True)
+PLOT_DIR = "model_outputs"
 
 # === Evaluate Function ===
 def evaluate_model(name, y_true, y_pred):
@@ -149,9 +150,10 @@ plt.close()
 
 
 # === Actual vs Predicted Plot ===
+rf_pred = predictions['Random Forest']
 plt.figure(figsize=(10, 6))
 plt.plot(y_test.values[:300], label='Actual', color='black', linewidth=2)
-plt.plot(y_pred[:300], label='Predicted (RF)', color='green', linewidth=2)
+plt.plot(rf_pred[:300], label='Predicted (RF)', color='green', linewidth=2)
 plt.title("Actual vs Predicted - Random Forest")
 plt.xlabel("Sample Index")
 plt.ylabel("Stator Winding Temperature")
@@ -162,9 +164,9 @@ plt.savefig(f"{PLOT_DIR}/rf_actual_vs_predicted_only.png")
 plt.close()
 
 # === Residuals Plot ===
-residuals = y_test - y_pred
+residuals = y_test - rf_pred
 plt.figure(figsize=(8, 5))
-plt.scatter(y_pred, residuals, alpha=0.5, color='blue')
+plt.scatter(rf_pred, residuals, alpha=0.5, color='blue')
 plt.axhline(y=0, color='red', linestyle='--')
 plt.xlabel("Predicted Values")
 plt.ylabel("Residuals (Actual - Predicted)")
@@ -176,7 +178,7 @@ plt.close()
 
 # === Regression Line Plot ===
 plt.figure(figsize=(8, 6))
-sns.regplot(x=y_test, y=y_pred, scatter_kws={'alpha':0.3}, line_kws={"color": "red"})
+sns.regplot(x=y_test, y=rf_pred, scatter_kws={'alpha':0.3}, line_kws={"color": "red"})
 plt.xlabel("Actual")
 plt.ylabel("Predicted")
 plt.title("Regression Line - Random Forest")
@@ -189,7 +191,7 @@ print("✅ RF-only plots saved to 'model_outputs/' as:\n- rf_actual_vs_predicted
 
 
 # === Line Residuals Plot (No Scatter) ===
-residuals = y_test.values - y_pred
+residuals = y_test.values - rf_pred
 plt.figure(figsize=(10, 5))
 plt.plot(residuals[:300], color='purple', linewidth=1.5)
 plt.axhline(y=0, color='red', linestyle='--', linewidth=1)
