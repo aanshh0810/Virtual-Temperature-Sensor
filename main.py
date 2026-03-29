@@ -49,8 +49,8 @@ results = {}
 predictions = {}
 
 # === Create output directory ===
-os.makedirs("model_outputs", exist_ok=True)
 PLOT_DIR = "model_outputs"
+os.makedirs(PLOT_DIR, exist_ok=True)
 
 # === Evaluate Function ===
 def evaluate_model(name, y_true, y_pred):
@@ -73,13 +73,13 @@ for name, model in models.items():
     if r2 > best_r2:
         best_r2 = r2
         best_model = model
-        joblib.dump(best_model, 'model_outputs/best_rf_model.pkl')
+        joblib.dump(best_model, os.path.join(PLOT_DIR, 'best_model.pkl'))
 
 # === Save Metrics ===
-pd.DataFrame(results).T.to_csv("model_outputs/model_metrics.csv")
+pd.DataFrame(results).T.to_csv(f"{PLOT_DIR}/model_metrics.csv")
 
 # === Save Results to TXT ===
-with open("model_outputs/model_results.txt", "w", encoding="utf-8") as f:
+with open(f"{PLOT_DIR}/model_results.txt", "w", encoding="utf-8") as f:
     f.write("Model Evaluation Results\n")
     f.write("=" * 40 + "\n\n")
     for name, metrics in results.items():
@@ -88,7 +88,7 @@ with open("model_outputs/model_results.txt", "w", encoding="utf-8") as f:
             f.write(f"{metric_name}: {value:.5f}\n")
         f.write("\n")
     f.write(f"Best Model: {type(best_model).__name__}\n")
-    f.write("Model saved as: best_rf_model.pkl\n")
+    f.write("Model saved as: best_model.pkl\n")
 
 # === Feature Importance and Cumulative Plot ===
 for name, model in models.items():
@@ -101,7 +101,7 @@ for name, model in models.items():
         sns.barplot(x=importances[indices], y=features_sorted)
         plt.title(f"{name} Feature Importance")
         plt.tight_layout()
-        plt.savefig(f"model_outputs/{name}_feature_importance.png")
+        plt.savefig(f"{PLOT_DIR}/{name}_feature_importance.png")
         plt.close()
 
         # Cumulative
@@ -113,12 +113,14 @@ for name, model in models.items():
         plt.ylabel("Cumulative Importance")
         plt.grid(True)
         plt.tight_layout()
-        plt.savefig(f"model_outputs/{name}_cumulative_importance.png")
+        plt.savefig(f"{PLOT_DIR}/{name}_cumulative_importance.png")
         plt.close()
 
 # === ROC Curve for Random Forest (Binarized Target) ===
+# Retrieve Random Forest predictions for downstream plots
+rf_pred = predictions['Random Forest']
 y_binary = (y_test > y_test.median()).astype(int)
-y_prob_rf = models['Random Forest'].predict(X_test)
+y_prob_rf = rf_pred
 fpr, tpr, _ = roc_curve(y_binary, y_prob_rf)
 roc_auc = auc(fpr, tpr)
 
@@ -131,7 +133,7 @@ plt.title('ROC Curve - Random Forest (Binarized Target)')
 plt.legend(loc="lower right")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("model_outputs/roc_curve_rf.png")
+plt.savefig(f"{PLOT_DIR}/roc_curve_rf.png")
 plt.close()
 
 # === Actual vs Predicted Line Plot ===
@@ -145,12 +147,11 @@ plt.title('Actual vs Predicted - Model Comparison')
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("model_outputs/actual_vs_predicted.png")
+plt.savefig(f"{PLOT_DIR}/actual_vs_predicted.png")
 plt.close()
 
 
 # === Actual vs Predicted Plot ===
-rf_pred = predictions['Random Forest']
 plt.figure(figsize=(10, 6))
 plt.plot(y_test.values[:300], label='Actual', color='black', linewidth=2)
 plt.plot(rf_pred[:300], label='Predicted (RF)', color='green', linewidth=2)
@@ -187,7 +188,12 @@ plt.tight_layout()
 plt.savefig(f"{PLOT_DIR}/rf_regression_line.png")
 plt.close()
 
-print("✅ RF-only plots saved to 'model_outputs/' as:\n- rf_actual_vs_predicted_only.png\n- rf_residuals_plot.png\n- rf_regression_line.png")
+print(
+    f"✅ RF-only plots saved to '{PLOT_DIR}' as:\n"
+    "- rf_actual_vs_predicted_only.png\n"
+    "- rf_residuals_plot.png\n"
+    "- rf_regression_line.png"
+)
 
 
 # === Line Residuals Plot (No Scatter) ===
@@ -212,7 +218,7 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(df[input_features + [target]].corr(), annot=True, fmt=".2f", cmap="coolwarm")
 plt.title("Correlation Matrix")
 plt.tight_layout()
-plt.savefig("model_outputs/correlation_matrix.png")
+plt.savefig(f"{PLOT_DIR}/correlation_matrix.png")
 plt.close()
 
 # === RMSE Comparison Bar Chart ===
@@ -221,8 +227,8 @@ plt.figure(figsize=(10, 6))
 sns.barplot(x='Model', y='RMSE', data=metrics_df)
 plt.title("RMSE Comparison Across Models")
 plt.tight_layout()
-plt.savefig("model_outputs/rmse_bar_comparison.png")
+plt.savefig(f"{PLOT_DIR}/rmse_bar_comparison.png")
 plt.close()
 
 # === Final Message ===
-print("✅ All models trained, evaluated, and visualizations saved in 'model_outputs/'.")
+print(f"✅ All models trained, evaluated, and visualizations saved in '{PLOT_DIR}/'.")
